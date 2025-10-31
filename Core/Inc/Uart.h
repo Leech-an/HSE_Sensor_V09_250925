@@ -35,6 +35,10 @@
 
 #define CMD_SET_FIRMWARE_DOWNLOAD	0xF0
 
+#define CMD_FIRMWARE_UPDATE 0x11
+
+#define CMD_MODULE_TEST 0x12
+
 #define CMD_IDLE				0xFF
 
 

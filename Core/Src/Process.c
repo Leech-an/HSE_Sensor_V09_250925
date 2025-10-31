@@ -5,13 +5,13 @@
 
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include "main.h"
 
 #include <stm32l4xx_hal.h>
 #include <Const.h>
 #include <G_Value.h>
 
 #include "Uart.h"
-
 
 
 #include "Process.h"
@@ -22,6 +22,7 @@
 #include "Fan.h"
 
 #include <Measure.h>
+
 
 #define AIRCR_VECTKEY_MASK  0x05FA0000
 
@@ -199,6 +200,10 @@ static void SystemTimeCtrl(void);
 
 void RngOfPdAdcSamplingVal(uint16_t nAdcVal);
 void RngOfSiPmAdcSamplingVal(uint16_t nAdcVal);
+
+extern UART_HandleTypeDef huart1;
+extern void JumpToBootloader(void);
+
 
 void PROC_Init(void)
 {
@@ -798,6 +803,21 @@ void RspAssamblyTxMsg(uint8_t nCMD)
 			}
 		}break;
 
+		case CMD_MODULE_TEST: { // LENGTH 6
+
+		    uint16_t hv_val = (uint16_t)tHvCtrl.AvgAdcVal;
+		    uint16_t ld_val = (uint16_t)tLdCtrl.AvgAdcVal;
+		    uint16_t mcu_val = (uint16_t)tSysState.Temp;
+
+		    tMsgPkt.Txbuff[tMsgPkt.TxMsgCnt++] = 0x06;
+		    tMsgPkt.Txbuff[tMsgPkt.TxMsgCnt++] = (uint8_t)((hv_val >> 8) & 0xFF);
+		    tMsgPkt.Txbuff[tMsgPkt.TxMsgCnt++] = (uint8_t)( hv_val       & 0xFF);
+		    tMsgPkt.Txbuff[tMsgPkt.TxMsgCnt++] = (uint8_t)((ld_val >> 8) & 0xFF);
+		    tMsgPkt.Txbuff[tMsgPkt.TxMsgCnt++] = (uint8_t)( ld_val       & 0xFF);
+		    tMsgPkt.Txbuff[tMsgPkt.TxMsgCnt++] = (uint8_t)((mcu_val >> 8) & 0xFF);
+		    tMsgPkt.Txbuff[tMsgPkt.TxMsgCnt++] = (uint8_t)( mcu_val       & 0xFF);
+		} break;
+
 		case CMD_SOFT_RESET: {
 			tMsgPkt.Txbuff[tMsgPkt.TxMsgCnt++] = 0x00;
 		}break;
@@ -805,6 +825,10 @@ void RspAssamblyTxMsg(uint8_t nCMD)
 		case CMD_SET_FIRMWARE_DOWNLOAD: {
 			tMsgPkt.Txbuff[tMsgPkt.TxMsgCnt++] = 0x00;
 		}break;
+
+		case CMD_FIRMWARE_UPDATE: {
+		    tMsgPkt.Txbuff[tMsgPkt.TxMsgCnt++] = 0x00;
+		} break;
 	}
 
 	tMsgPkt.Txbuff[tMsgPkt.TxMsgCnt++] = UART_Chksum((uint8_t *)tMsgPkt.Txbuff, tMsgPkt.TxMsgCnt); 	// CHECKSUM
@@ -1055,13 +1079,19 @@ void PostMessage_Proc(void)
 				RspAssamblyTxMsg(tMsgPkt.Cmd);
 			}break;
 
+			case CMD_MODULE_TEST:
+			{
+
+			    RspAssamblyTxMsg(tMsgPkt.Cmd);
+			} break;
+
 			case CMD_SET_FIRMWARE_DOWNLOAD :
 			{
 				//if (0x00 == tMsgPkt.Leng) { tSysState.ClientReqType = CLIENT_REQ_GET;}
 				RspAssamblyTxMsg(tMsgPkt.Cmd);
 				SetCfg_Flash_Firmware_Write();
 				m_SysProcSeq = SYS_SEQ_RESET;
-				//FlagFirmwareWROn = ON;
+
 
 			}break;
 
@@ -1072,6 +1102,20 @@ void PostMessage_Proc(void)
 				RspAssamblyTxMsg(tMsgPkt.Cmd);
 				m_SysProcSeq = SYS_SEQ_RESET;
 			}break;
+
+			case CMD_FIRMWARE_UPDATE:
+			{
+			   RspAssamblyTxMsg(tMsgPkt.Cmd);
+
+				// 그 자리에서 바로 전송
+				HAL_UART_Transmit(&huart1, tUartMsg.RingTxTemp, tUartMsg.TxTempCnt, 100);
+
+			    HAL_Delay(5);
+			    __disable_irq();
+			    JumpToBootloader();
+
+			} break;
+
 		}
 
 		UART_RxInit();
@@ -1090,8 +1134,13 @@ void Operating_Process(void)
 			EXT_PD_Ctrl(ON);
 			EXT_LD_Ctrl(ON);
 
+			//tSysState.FlagGetAdcOn = ON;          // ADC 갱신 허용 플래그
+			//ADC_LD_Measuerment(ON);               // LD 평균 갱신
+			//ADC_HV_Measuerment(ON);
+
 			ReadMeasuredVal();
 		}
+
 	}
 	else
 	{
@@ -1742,6 +1791,7 @@ void SYSTEM_SEQ(void)
 		{
 			if(TRUE == FanCleanCtrl()) {
 				m_SysProcSeq = SYS_SEQ_READY;
+
 			}
 		}break;
 

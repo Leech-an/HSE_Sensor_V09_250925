@@ -38,7 +38,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+void JumpToBootloader(void);
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -247,9 +247,7 @@ int main(void)
 	 SYSTEM_Process();
 	 UART_Transmit_Proc(&huart1);
 
-	  //  if (FlagFirmwareWROn == ON) {   // BL 명령 등 특정 이벤트가 발생했을 때만
-	    //    HAL_Delay(200);
-	      //  JumpToBootloader(); }
+
 
     /* USER CODE END WHILE */
 

@@ -128,7 +128,9 @@ uint8_t UART_CMD_CHK(uint8_t nCmd, uint8_t nLeng)
 		case CMD_DEVICE_STATE	:		{ if (1 == nLeng) { Result = TRUE; } } break;
 		case CMD_SOFT_RESET	:			{ if (0 == nLeng) { Result = TRUE; } } break;
 		case CMD_SET_CORRECTION_VAL :	{ if ((2 == nLeng) || (6 == nLeng)) { Result = TRUE; }  } break;
-		case CMD_SET_FIRMWARE_DOWNLOAD:	{ if (0 == nLeng) { Result = TRUE; }  } break;
+		case CMD_SET_FIRMWARE_DOWNLOAD:	{ if (0 == nLeng) { Result = TRUE; } } break;
+		case CMD_FIRMWARE_UPDATE:       { if (0 == nLeng) { Result = TRUE; } } break;
+		case CMD_MODULE_TEST: 			{ if (0 == nLeng) { Result = TRUE; } } break;
 	}
 
 	return Result;
