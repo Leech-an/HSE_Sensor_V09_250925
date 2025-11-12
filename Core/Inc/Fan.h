@@ -40,5 +40,5 @@ extern struct _tFAN	tFan;
 
 extern void FAN_Init(void);
 extern void FAN_Ctrl(uint8_t SelSpd, uint8_t nCtrlOn);
-extern uint8_t FAN_RpmMeasuerment(uint8_t MeasureOn);
+extern uint8_t FAN_RpmMeasurement(uint8_t MeasureOn);
 extern uint8_t FAN_ChkCondition(uint16_t DefSpd,uint32_t nRpmCnt);

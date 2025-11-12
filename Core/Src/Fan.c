@@ -41,7 +41,7 @@ void FAN_Ctrl(unsigned char SelSpd, unsigned char nCtrlOn)
 	if(FAN_CTRL_OFF == nCtrlOn) { tFan.RpmCurrCnt = 0; SetFanSpdCtrl(FAN_SPD_LO); }
 }
 
-uint8_t FAN_RpmMeasuerment(uint8_t MeasureOn)
+uint8_t FAN_RpmMeasurement(uint8_t MeasureOn)
 {
 	uint8_t result = FALSE;
 

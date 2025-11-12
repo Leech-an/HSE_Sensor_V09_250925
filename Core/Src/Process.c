@@ -487,6 +487,39 @@ void Measure_Stop(void)
 	tSysState.FlagGetAdcOn = OFF;
 }
 
+//void AssmTxMsg_PmMeasureResult(void)																																																																																																																																																																																																																																																																																																																																																																																																																																																										void AssmTxMsg_PmMeasureResult(void)
+//{
+//    // (1) 측정값 읽기 (실제 변수명에 맞게)
+//    uint16_t hv  = (uint16_t)tHvCtrl.AvgAdcVal;   // 없으면 0으로 대체
+//    uint16_t ld  = (uint16_t)tLdCtrl.AvgAdcVal;   // 없으면 0으로 대체
+//    uint16_t mcu = (uint16_t)tSysState.Temp;      // 없다면 제외 가능
+//
+//    // (2) 길이를 나중에 채우기 위해 자리만 확보
+//    uint16_t start = tMsgPkt.TxMsgCnt;
+//    uint16_t len_idx = tMsgPkt.TxMsgCnt++;        // 길이 바이트 자리
+//    uint16_t payload_bytes = 0;
+//
+//    // (3) 페이로드 채우기 (필요한 항목만 남겨도 됨)
+//    tMsgPkt.Txbuff[tMsgPkt.TxMsgCnt++] = (hv >> 8) & 0xFF;
+//    tMsgPkt.Txbuff[tMsgPkt.TxMsgCnt++] = (hv      ) & 0xFF;
+//    payload_bytes += 2;
+//
+//    tMsgPkt.Txbuff[tMsgPkt.TxMsgCnt++] = (ld >> 8) & 0xFF;
+//    tMsgPkt.Txbuff[tMsgPkt.TxMsgCnt++] = (ld      ) & 0xFF;
+//    payload_bytes += 2;
+//
+//    tMsgPkt.Txbuff[tMsgPkt.TxMsgCnt++] = (mcu >> 8) & 0xFF;
+//    tMsgPkt.Txbuff[tMsgPkt.TxMsgCnt++] = (mcu     ) & 0xFF;
+//    payload_bytes += 2;
+//
+//    // (4) 길이 바이트 확정
+//    tMsgPkt.Txbuff[len_idx] = (uint8_t)payload_bytes;
+//
+//
+//    // (6) 전송 (프로젝트 송신 루틴에 맞게)
+//    HAL_UART_Transmit(&huart1, tMsgPkt.Txbuff + start, (uint16_t)(tMsgPkt.TxMsgCnt - start), 100);
+//}
+
 void AssmTxMsg_GetBoundaryVolt(uint8_t nCh)
 {
 	 if(0x00 == nCh)
@@ -699,7 +732,7 @@ void RspAssamblyTxMsg(uint8_t nCMD)
 
 //		case CMD_MEASUER_READ_VAL : { // LENGTH 0, Read Measurement Value
 //			tMsgPkt.Txbuff[tMsgPkt.TxMsgCnt++] = 0x34; //52
-//			AssmTxMsg_PmMesaureResult();
+//			AssmTxMsg_PmMeasureResult();
 //		} break;
 
 		case CMD_START_FAN_CLEAN : {
@@ -926,6 +959,8 @@ void PostMessage_Proc(void)
 {
 	if(ON == tMsgPkt.FlagRxPktOn)
 	{
+
+
 		switch(tMsgPkt.Cmd)
 		{
 			case CMD_BIT_MANUAL_START :
@@ -1111,8 +1146,34 @@ void PostMessage_Proc(void)
 				HAL_UART_Transmit(&huart1, tUartMsg.RingTxTemp, tUartMsg.TxTempCnt, 100);
 
 			    HAL_Delay(5);
-			    __disable_irq();
+//			    __disable_irq();
+
+
+			    EXT_LD_Ctrl(EXT_LD_CTRL_OFF);
+			    EXT_HV_Ctrl(EXT_HV_CTRL_OFF);
+			    EXT_PD_Ctrl(EXT_PD_CTRL_OFF);
+
+//			    __HAL_RCC_GPIOB_CLK_ENABLE();  // 실제 포트로 변경
+
+
+//			    GPIO_InitTypeDef g = {0};
+//			    g.Pin   = LD_CON_Pin | HV_CON_Pin;           // 필요 시 다른 EN 핀 추가
+//			    g.Mode  = GPIO_MODE_OUTPUT_PP;
+//			    g.Pull  = GPIO_NOPULL;
+//			    g.Speed = GPIO_SPEED_FREQ_LOW;
+//
+//
+//			    HAL_GPIO_Init(GPIOB, &g);
+
+
+//			    HAL_GPIO_WritePin(GPIOB, LD_CON_Pin, GPIO_PIN_RESET);
+//			    HAL_GPIO_WritePin(GPIOB, HV_CON_Pin, GPIO_PIN_RESET);
+
+
+
 			    JumpToBootloader();
+
+
 
 			} break;
 
@@ -1126,6 +1187,9 @@ void PostMessage_Proc(void)
 
 void Operating_Process(void)
 {
+
+
+
 	if(OFF == tSysState.FlagStatClenaOn)
 	{
 		if(ON == tSysState.FlagOperModeOn)
@@ -1314,7 +1378,7 @@ void Built_In_Test_Proc(void)
 			if ( TRUE == WaitHoldTime_Sec(ON, FAN_CON_ON_TIME) )
 			{
 				tFan.RpmCurrCnt = 0;
-				FAN_RpmMeasuerment(ON);
+				FAN_RpmMeasurement(ON);
 				WaitTime_Init();
 
 				m_BITProcSeq = BIT_SEQ_FAN_CON_LO_SPD_CHK;
@@ -1328,7 +1392,7 @@ void Built_In_Test_Proc(void)
 				if (ON == FAN_ChkCondition(DEFAULT_FAN_RPM_LOW_SPD_COUNT, tFan.RpmCurrCnt))
 				{
 					tFan.RpmCurrCnt = 0;
-					FAN_RpmMeasuerment(OFF);
+					FAN_RpmMeasurement(OFF);
 					FAN_Ctrl(HI, ON);
 
 					tSysState.DeviceState = DeviceSetState(DEVICE_BIT_ADDR_SPD_N, OFF);
@@ -1370,7 +1434,7 @@ void Built_In_Test_Proc(void)
 			if ( TRUE == WaitHoldTime_Sec(ON, FAN_CON_ON_TIME) )
 			{
 				tFan.RpmCurrCnt = 0;
-				FAN_RpmMeasuerment(ON);
+				FAN_RpmMeasurement(ON);
 				WaitTime_Init();
 
 				m_BITProcSeq = BIT_SEQ_FAN_CON_HI_SPD_CHK;
@@ -1383,7 +1447,7 @@ void Built_In_Test_Proc(void)
 			{
 				if (ON == FAN_ChkCondition(DEFAULT_FAN_RPM_HIGH_SPD_COUNT, tFan.RpmCurrCnt))
 				{
-					FAN_RpmMeasuerment(OFF);
+					FAN_RpmMeasurement(OFF);
 					FAN_Ctrl(LO, ON);
 
 					tSysState.DeviceState = DeviceSetState(DEVICE_BIT_ADDR_SPD_H, OFF);

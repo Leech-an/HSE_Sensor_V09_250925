@@ -47,6 +47,9 @@ volatile uint16_t Adc_Temp[16];
 
 #define BOOTLOADER_START_ADDRESS  0x1FFF0000U  // STM32L412KBU6 System Memory 주소
 
+volatile uint8_t gBootJumping = 0;
+
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -574,13 +577,13 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, FAN_CON_Pin|FAN_SPEED_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, FAN_CON_Pin|FAN_SPD_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, HV_CON_Pin|LD_CON_Pin|PROM_WP_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : FAN_CON_Pin FAN_SPEED_Pin */
-  GPIO_InitStruct.Pin = FAN_CON_Pin|FAN_SPEED_Pin;
+  /*Configure GPIO pins : FAN_CON_Pin FAN_SPD_Pin */
+  GPIO_InitStruct.Pin = FAN_CON_Pin|FAN_SPD_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -617,13 +620,13 @@ static void MX_GPIO_Init(void)
     __disable_irq();
 
 
-    HAL_RCC_DeInit();
-    HAL_DeInit();
+   HAL_RCC_DeInit();
+//   HAL_DeInit();
 
+   SysTick->CTRL = 0;
+   SysTick->LOAD = 0;
+   SysTick->VAL  = 0;
 
-    SysTick->CTRL = 0;
-    SysTick->LOAD = 0;
-    SysTick->VAL  = 0;
 
     // System Memory의 MSP
     __set_MSP(*(__IO uint32_t*) BOOTLOADER_START_ADDRESS);

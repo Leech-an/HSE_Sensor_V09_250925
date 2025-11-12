@@ -13,7 +13,11 @@
 extern uint8_t m_BITProcSeq;
 extern uint8_t m_SysProcSeq;
 
+void AssmTxMsg_PmMeasureResult(void);
+
 extern void PROC_Init(void);
 extern void SYSTEM_Process(void);
 extern void PostMessage_Proc(void);
+
+
 //extern uint8_t FlagFirmwareWROn;
