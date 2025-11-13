@@ -1140,40 +1140,30 @@ void PostMessage_Proc(void)
 
 			case CMD_FIRMWARE_UPDATE:
 			{
+				//25.11.12 Bootload 진입 시 LD 켜지는 현상 수정
 			   RspAssamblyTxMsg(tMsgPkt.Cmd);
-
 				// 그 자리에서 바로 전송
 				HAL_UART_Transmit(&huart1, tUartMsg.RingTxTemp, tUartMsg.TxTempCnt, 100);
-
 			    HAL_Delay(5);
-//			    __disable_irq();
 
+			    HAL_GPIO_WritePin(GPIOB, LD_CON_Pin | HV_CON_Pin, GPIO_PIN_RESET);
 
-			    EXT_LD_Ctrl(EXT_LD_CTRL_OFF);
-			    EXT_HV_Ctrl(EXT_HV_CTRL_OFF);
-			    EXT_PD_Ctrl(EXT_PD_CTRL_OFF);
+			    // 2) 방해될 가능성 있는 것들만 레지스터 레벨로 정지/리셋 (핸들 불필요)
+			    __disable_irq();
+			    SysTick->CTRL = 0;  // SysTick 끄기
 
-//			    __HAL_RCC_GPIOB_CLK_ENABLE();  // 실제 포트로 변경
+			    // UART 충돌 방지
+			    __HAL_RCC_USART1_FORCE_RESET();   __HAL_RCC_USART1_RELEASE_RESET();
+			    __HAL_RCC_LPUART1_FORCE_RESET();  __HAL_RCC_LPUART1_RELEASE_RESET();
 
-
-//			    GPIO_InitTypeDef g = {0};
-//			    g.Pin   = LD_CON_Pin | HV_CON_Pin;           // 필요 시 다른 EN 핀 추가
-//			    g.Mode  = GPIO_MODE_OUTPUT_PP;
-//			    g.Pull  = GPIO_NOPULL;
-//			    g.Speed = GPIO_SPEED_FREQ_LOW;
-//
-//
-//			    HAL_GPIO_Init(GPIOB, &g);
-
-
-//			    HAL_GPIO_WritePin(GPIOB, LD_CON_Pin, GPIO_PIN_RESET);
-//			    HAL_GPIO_WritePin(GPIOB, HV_CON_Pin, GPIO_PIN_RESET);
+			    // DMA, 타이머, ADC 리셋
+			    __HAL_RCC_DMA1_FORCE_RESET();     __HAL_RCC_DMA1_RELEASE_RESET();
+			    __HAL_RCC_TIM2_FORCE_RESET();     __HAL_RCC_TIM2_RELEASE_RESET();
+			    __HAL_RCC_ADC_FORCE_RESET();      __HAL_RCC_ADC_RELEASE_RESET();
 
 
 
 			    JumpToBootloader();
-
-
 
 			} break;
 

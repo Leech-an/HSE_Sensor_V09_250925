@@ -202,6 +202,8 @@ int main(void)
 
   /* USER CODE BEGIN Init */
   memset(Adc_Temp, 0, sizeof(Adc_Temp));
+
+
   /* USER CODE END Init */
 
   /* Configure the system clock */

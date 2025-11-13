@@ -63,8 +63,8 @@ all: main-build
 main-build: HSE_Sensor_V09.elf secondary-outputs
 
 # Tool invocations
-HSE_Sensor_V09.elf HSE_Sensor_V09.map: $(OBJS) $(USER_OBJS) C:\Users\USER\STM32CubeIDE\workspace_1.19.0\(Debug)_250926(CH)_HSE_Sensor_V10\V09\V09\HSE_Sensor_V09_250925\STM32L412KBUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "HSE_Sensor_V09.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\USER\STM32CubeIDE\workspace_1.19.0\(Debug)_250926(CH)_HSE_Sensor_V10\V09\V09\HSE_Sensor_V09_250925\STM32L412KBUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="HSE_Sensor_V09.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+HSE_Sensor_V09.elf HSE_Sensor_V09.map: $(OBJS) $(USER_OBJS) C:\Users\USER\STM32CubeIDE\workspace_1.19.0\(Debug)_251112(CH)_HSE_Sensor_V10\V09\V09\HSE_Sensor_V09_251112\STM32L412KBUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "HSE_Sensor_V09.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\USER\STM32CubeIDE\workspace_1.19.0\(Debug)_251112(CH)_HSE_Sensor_V10\V09\V09\HSE_Sensor_V09_251112\STM32L412KBUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="HSE_Sensor_V09.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

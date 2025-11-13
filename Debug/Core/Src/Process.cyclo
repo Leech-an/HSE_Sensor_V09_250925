@@ -18,10 +18,10 @@
 ../Core/Src/Process.c:707:6:RspAssamblyTxMsg	36
 ../Core/Src/Process.c:874:6:Manual_GetAdcMsg	7
 ../Core/Src/Process.c:958:6:PostMessage_Proc	41
-../Core/Src/Process.c:1188:6:Operating_Process	3
-../Core/Src/Process.c:1216:6:RngOfPdAdcSamplingVal	21
-../Core/Src/Process.c:1292:6:RngOfSiPmAdcSamplingVal	6
-../Core/Src/Process.c:1316:6:Built_In_Test_Proc	57
-../Core/Src/Process.c:1776:6:SYSTEM_SEQ	31
-../Core/Src/Process.c:1905:6:SYSTEM_Process	1
-../Core/Src/Process.c:1914:6:SystemTimeCtrl	9
+../Core/Src/Process.c:1178:6:Operating_Process	3
+../Core/Src/Process.c:1206:6:RngOfPdAdcSamplingVal	21
+../Core/Src/Process.c:1282:6:RngOfSiPmAdcSamplingVal	6
+../Core/Src/Process.c:1306:6:Built_In_Test_Proc	57
+../Core/Src/Process.c:1766:6:SYSTEM_SEQ	31
+../Core/Src/Process.c:1895:6:SYSTEM_Process	1
+../Core/Src/Process.c:1904:6:SystemTimeCtrl	9
